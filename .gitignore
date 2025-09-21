@@ -1,0 +1,90 @@
+# Ardium .gitignore
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor/IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-*
+
+# Build and Distribution
+build/
+dist/
+out/
+*.egg-info/
+*.egg
+
+# Dependencies and Package Managers
+node_modules/
+vendor/
+*.lock
+
+# Logs
+*.log
+logs/
+
+# Runtime and Cache
+*.pid
+.cache/
+.tmp/
+temp/
+
+# Environment and Configuration
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+config.local.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Compiled Files
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+*.class
+*.pyc
+*.pyo
+__pycache__/
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Documentation Build
+docs/_build/
+docs/build/
+
+# Test Coverage
+coverage/
+*.coverage
+.nyc_output/
+
+# Language-Specific Ignores
+# (Will be updated as the project's technology stack is determined)
+
+# IDE Specific
+.metals/
+.bloop/
+.vscode/settings.json
+
+# Temporary files
+*.tmp
+*.temp

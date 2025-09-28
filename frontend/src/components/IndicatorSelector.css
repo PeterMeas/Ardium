@@ -1,0 +1,26 @@
+/* IndicatorSelector.css - Styles for clickable indicator boxes */
+
+.indicator-selector {
+  margin: 20px 0;
+}
+
+.indicator-box {
+  display: inline-block;
+  padding: 10px 15px;
+  margin: 5px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.indicator-box:hover {
+  border-color: #666;
+}
+
+.indicator-box.selected {
+  background-color: #1F2937;
+  color: white;
+  border-color: #1F2937;
+}
+

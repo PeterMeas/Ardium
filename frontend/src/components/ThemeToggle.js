@@ -13,7 +13,7 @@ function ThemeToggle({ isDark, setIsDark }) {
 
 return (
     <button onClick={handleToggleTheme} className="theme-toggle">
-        {isDark ? "☀️ Light" : "🌙 Dark"}
+        {isDark ? "💡" : "🌚"}
     </button>
     );
 

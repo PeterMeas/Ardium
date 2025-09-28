@@ -1,8 +1,13 @@
 import "./App.css";
 import TickerInput from "./components/TickerInput";
 import ThemeToggle from "./components/ThemeToggle";
+import Footer from "./components/Footer";
 import TradingViewChart from "./components/TradingViewChart";
-import { useState } from "react";
+
+
+
+
+import { useState, useRef, useEffect } from "react";
 
 function App() {
   const [ticker, setTicker] = useState(null);       // user-entered ticker
@@ -10,6 +15,8 @@ function App() {
   const [indicator, setIndicator] = useState("none"); // selected indicator
   const [isDark, setIsDark] = useState(false);
   const indicators = ["none", "SMA"]; // can add more later
+
+
 
   const fetchStock = async () => {
     if (!ticker) return;
@@ -19,13 +26,41 @@ function App() {
     }
 
     try {
-      console.log('Fetching ticker:', ticker);
+    console.log('Fetching ticker:', ticker);
       const res = await fetch(`http://127.0.0.1:8000/stock/${ticker}`);
-      const stockData = await res.json();
+      const data = await res.json();
 
-      // Set the chart data (TradingView format)
-      setChartData(stockData);
+      let prices = data.prices;
 
+      // Simple moving average example
+      if (indicator === "SMA") {
+        const window = 3;
+        prices = prices.map((_, i, arr) => {
+          if (i < window - 1) return null;
+          const sum = arr.slice(i - window + 1, i + 1).reduce((a, b) => a + b, 0);
+          return sum / window;
+        });
+      }
+
+      setChartData({
+        labels: data.dates,
+        datasets: [
+          {
+            label: `${data.ticker} Price`,
+            data: data.prices,
+            borderColor: "blue",
+            fill: false,
+          },
+          indicator !== "none"
+            ? {
+                label: `${data.ticker} ${indicator}`,
+                data: prices,
+                borderColor: "orange",
+                fill: false,
+              }
+            : null,
+        ].filter(Boolean),
+      });
     } catch (err) {
       console.error("Failed to fetch stock:", err);
       alert("Failed to fetch stock data. Make sure the ticker exists!");
@@ -36,9 +71,19 @@ function App() {
   return (
     <main className="App">
       <header className="app-header">
-        <h1>Ardium</h1>
+        <div className="left-section">
+          <div className="logo-section">
+            <h1 className="app-logo">Placeholder</h1>
+            <p className="app-subtitle">Stock Analysis</p>
+          </div>
+          <nav className="main-nav">
+            <button className="nav-link">Charts</button>
+            <button className="nav-link">Screener</button>
+            <button className="nav-link">News</button>
+            <button className="nav-link">Github</button>
+          </nav>
+        </div>
         <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
-        <p className="subtitle"></p>
       </header>
 
       <section className="card">
@@ -54,11 +99,12 @@ function App() {
         </div>
       </section>
 
-      {chartData && (
-        <section className="chart-wrapper">
-          <TradingViewChart data={chartData} isDark={isDark} />
-        </section>
-      )}
+      {/* TradingView Candlestick Chart */}
+      <section className="chart-wrapper">
+        <TradingViewChart data={chartData}/>
+      </section>
+
+      <Footer />
     </main>
   );
 }

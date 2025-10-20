@@ -1,62 +1,105 @@
 import "./TradingViewChart.css";
+import { createChart, CandlestickSeries } from 'lightweight-charts';
+import { useState, useRef, useEffect } from "react";
 
-import { 
-    CandlestickSeries,
-  createChart
-} from 'lightweight-charts';
-
-import { 
-    useState, 
-    useRef, 
-    useEffect 
-} from "react";
-
-function TradingViewChart({data}) {
+function TradingViewChart({ data }) {
     const chartContainerRef = useRef(null);
-    //const chart = createChart(chartContainerRef.current, CandlestickSeries);
+    const chartRef = useRef(null);
+    const candleSeriesRef = useRef(null);
 
+    // create chart once (mount)
     useEffect(() => {
-        const chart = createChart(chartContainerRef.current, {
-            width: chartContainerRef.current.clientWidth,
+        if (!chartContainerRef.current) return;
+        if (typeof createChart !== 'function') {
+            console.error('createChart is not a function. Check lightweight-charts installation/import.');
+            return;
+        }
+
+        chartRef.current = createChart(chartContainerRef.current, {
+            width: chartContainerRef.current.clientWidth || 800,
             height: 400,
+            layout: { background: { color: '#ffffff' }, textColor: '#333' },
         });
-        
-        // Use the correct API: addSeries() with series type
-        const candleSeries = chart.addSeries(CandlestickSeries,
-            {upColor: '#26a69a',
-            downColor: '#ef5350', 
-            borderVisible: false, 
-            wickUpColor: '#26a69a', 
-            wickDownColor: '#ef5350'
-            
-        });
-                
-        // Use prop data if available, otherwise use sample data
-        const chartData = data && data.length > 0 ? data : [
-            { open: 10, high: 10.63, low: 9.49, close: 9.55, time: 1642427876}, 
-            { open: 9.55, high: 10.30, low: 9.42, close: 9.94, time: 1642514276 }, 
-            { open: 9.94, high: 10.17, low: 9.92, close: 9.78, time: 1642600676 }, 
-            { open: 9.78, high: 10.59, low: 9.18, close: 9.51, time: 1642687076 },
-            { open: 9.51, high: 10.46, low: 9.10, close: 10.17, time: 1642773476 },
-            { open: 10.17, high: 10.96, low: 10.16, close: 10.47, time: 1642859876 }, 
-            { open: 10.47, high: 11.39, low: 10.40, close: 10.81, time: 1642946276 }, 
-            { open: 10.81, high: 11.60, low: 10.30, close: 10.75, time: 1643032676 }, 
-            { open: 10.75, high: 11.60, low: 10.49, close: 10.93, time: 1643119076 },
-            { open: 10.93, high: 11.53, low: 10.76, close: 10.96, time: 1643205476 }
-        ];
-        candleSeries.setData(chartData);
-        chart.timeScale().fitContent();
+
+        // v5 API: addSeries(SeriesConstructor, options)
+        try {
+            candleSeriesRef.current = chartRef.current.addSeries(CandlestickSeries, {
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                borderVisible: false,
+                wickUpColor: '#26a69a',
+                wickDownColor: '#ef5350'
+            });
+            console.log('created candleSeriesRef via addSeries(CandlestickSeries, ...)', !!candleSeriesRef.current);
+        } catch (err) {
+            console.error('failed to create candlestick series via addSeries:', err);
+        }
 
         return () => {
-            chart.remove();
+            try { if (chartRef.current && typeof chartRef.current.remove === 'function') chartRef.current.remove(); }
+            catch (err) { console.warn('error removing chart', err); }
+            chartRef.current = null;
+            candleSeriesRef.current = null;
         };
-    }, []); // Re-render when theme or data changes
+    }, []); // mount only
 
-    return (
-        <div ref={chartContainerRef} className="chart-container">
+    // update series when data changes
+    useEffect(() => {
+        console.log('TradingViewChart received data prop:', data && data.length);
+        if (!candleSeriesRef.current) {
+            console.warn('candleSeriesRef not created yet; cannot setData');
+            return;
+        }
 
-        </div>
-    );
+        if (!data) {
+            try { candleSeriesRef.current.setData([]); } catch (e) {}
+            return;
+        }
+
+        // if data is already an OHLC array, convert times to UNIX seconds
+        if (Array.isArray(data)) {
+            const transformed = data.map(d => ({
+                time: (typeof d.time === 'string') ? Math.floor(new Date(d.time).getTime() / 1000) : d.time,
+                open: Number(d.open),
+                high: Number(d.high),
+                low: Number(d.low),
+                close: Number(d.close),
+            }));
+            try {
+                candleSeriesRef.current.setData(transformed);
+                chartRef.current && chartRef.current.timeScale().fitContent();
+            } catch (err) {
+                console.error('error calling setData on candleSeriesRef', err);
+            }
+            return;
+        }
+
+        // If backend sent full AlphaVantage object, transform it here
+        if (data['Time Series (Daily)']) {
+            const alphaVantageData = data['Time Series (Daily)'];
+            const formattedData = Object.keys(alphaVantageData).map(date => {
+                const dp = alphaVantageData[date];
+                return {
+                    time: Math.floor(new Date(date).getTime() / 1000),
+                    open: parseFloat(dp['1. open']),
+                    high: parseFloat(dp['2. high']),
+                    low: parseFloat(dp['3. low']),
+                    close: parseFloat(dp['4. close']),
+                };
+            }).sort((a,b) => a.time - b.time);
+            try {
+                candleSeriesRef.current.setData(formattedData);
+                chartRef.current && chartRef.current.timeScale().fitContent();
+            } catch (err) {
+                console.error('error calling setData on candleSeriesRef', err);
+            }
+            return;
+        }
+
+        try { candleSeriesRef.current.setData([]); } catch (e) {}
+    }, [data]);
+
+    return <div ref={chartContainerRef} className="chart-container" />;
 }
 
 export default TradingViewChart;

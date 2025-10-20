@@ -11,6 +11,7 @@ This is sort of a passion project to me, in which I plan to combine both passion
 - **UI/UX**: Clean, minimal navigation with dark/light theme support
 - **Architecture**: Component-based structure ready for scaling
 
+![App screenshot](docs/images/screenshot.png)
 ---
 
 ## Development Roadmap

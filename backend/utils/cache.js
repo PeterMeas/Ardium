@@ -28,10 +28,10 @@ class SimpleCache {
     }
 
     if (entry.expires && entry.expires <= Date.now()) {
-    this.map.delete(key);
-    this.evictions++;
-    this.misses++;
-    return null;
+      this.map.delete(key);
+      this.evictions++;
+      this.misses++;
+      return null;
     }
 
     this.hits++;

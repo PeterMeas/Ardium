@@ -8,7 +8,7 @@ class SimpleCache {
     /** @type {number} */
     this.maxEntries = maxEntries;
     this.hits = 0;        // read successfully
-    this.misses = 0;      //no entry found 
+    this.misses = 0;      // no entry found 
     this.requests = 0;    //requests = hit + misses
     this.puts = 0;        // times a value was updated/inserted ( set called)) 
     this.evictions = 0;   // entries removed automatically ( capacity, expiration cleanup )

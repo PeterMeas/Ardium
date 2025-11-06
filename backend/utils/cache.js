@@ -74,7 +74,6 @@ class SimpleCache {
   getStats() {
     const hits = this.hits || 0;
     const misses = this.misses || 0;
-    const total = hits + misses;
     const hitRate = (this.hits / (this.hits + this.misses ));
         return { size: this.map ? this.map.size : 0 , 
                 maxEntries: this.maxEntries, 

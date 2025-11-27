@@ -10,11 +10,11 @@ import TradingViewChart from "./components/TradingViewChart";
 import { useState, useRef, useEffect } from "react";
 
 function App() {
+  const [showLanding, setShowLanding] = useState(true);
   const [ticker, setTicker] = useState('');   // user entered string
   const [chartData, setChartData] = useState(null); // chart data
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null);
-  
   const [indicator, setIndicator] = useState("none"); // selected indicator
   const [isDark, setIsDark] = useState(false);
   const indicators = ["none", "SMA"]; // can add more later
@@ -27,6 +27,7 @@ function App() {
   ];
 
 
+ 
   const fetchStock = async () => {
     let url;
 
@@ -40,9 +41,9 @@ function App() {
       setLoading(true);
       setFetchError(null);
       console.log('Fetching ticker:', ticker);
-      const res = await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=demo');
+      //const res = await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=demo');
     // const res = await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')
-     //const res = await fetch(`http://127.0.0.1:8000/api/stock/${ticker}`);
+     const res = await fetch(`http://127.0.0.1:8000/api/stock/${ticker}?outputsize=full`);
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
@@ -88,6 +89,7 @@ function App() {
     
   };
 
+ 
 
   return (
     <main className="App">
@@ -101,7 +103,12 @@ function App() {
             <button className="nav-link">Charts</button>
             <button className="nav-link">Screener</button>
             <button className="nav-link">News</button>
-            <button className="nav-link">Github</button>
+            <button
+              className="nav-link"
+              onClick={() => window.open('https://github.com/PeterMeas/Ardium', '_blank', 'noopener,noreferrer')}
+            >
+              Github
+            </button>
           </nav>
         </div>
         <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
@@ -110,12 +117,12 @@ function App() {
       <section className="card">
         <div className="form-group">
           <TickerInput
-          ticker = {ticker}
-          setTicker = {setTicker}
-          onFetch = {fetchStock}
-          indicator = {indicator}
-          setIndicator = {setIndicator}
-          indicators = {indicators}
+            ticker={ticker}
+            setTicker={setTicker}
+            onFetch={fetchStock}
+            indicator={indicator}
+            setIndicator={setIndicator}
+            indicators={indicators}
           />
         </div>
       </section>
@@ -127,7 +134,7 @@ function App() {
         ) : fetchError ? (
           <p style={{ color: 'crimson' }}>{fetchError}</p>
         ) : (
-          <TradingViewChart data={chartData}/>
+          <TradingViewChart data={chartData} />
         )}
       </section>
 

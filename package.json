@@ -1,10 +1,13 @@
 {
 	"name": "ardium",
-	"version":"1.0.0",
-	"scripts":{
+	"version": "1.0.0",
+	"scripts": {
 		"start": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\""
-},
-  "devDependencies": {
-    "concurrently": "^9.2.1"
-  }
+	},
+	"devDependencies": {
+		"concurrently": "^9.2.1"
+	},
+	"dependencies": {
+		"axios": "^1.12.2"
+	}
 }

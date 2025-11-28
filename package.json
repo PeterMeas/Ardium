@@ -2,7 +2,7 @@
 	"name": "ardium",
 	"version": "1.0.0",
 	"scripts": {
-		"start": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\""
+		"dev": "concurrently \"npm start --prefix backend\" \"npm run dev --prefix frontend\""
 	},
 	"devDependencies": {
 		"concurrently": "^9.2.1"

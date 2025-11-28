@@ -1,8 +1,8 @@
 import "./App.css";
-import TickerInput from "./components/TickerInput";
-import ThemeToggle from "./components/ThemeToggle";
-import Footer from "./components/Footer";
-import TradingViewChart from "./components/TradingViewChart";
+import TickerInput from "./components/TickerInput.jsx";
+import ThemeToggle from "./components/ThemeToggle.jsx";
+import Footer from "./components/Footer.jsx";
+import TradingViewChart from "./components/TradingViewChart.jsx";
 
 
 

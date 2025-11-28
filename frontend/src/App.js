@@ -27,7 +27,7 @@ function App() {
   ];
 
 
- 
+
   const fetchStock = async () => {
     let url;
 
@@ -36,14 +36,14 @@ function App() {
       alert("Ticker length must be between 2 and 5 characters.");
       return;
     }
-    
+
     try {
       setLoading(true);
       setFetchError(null);
       console.log('Fetching ticker:', ticker);
-      //const res = await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=demo');
-    // const res = await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')
-     const res = await fetch(`http://127.0.0.1:8000/api/stock/${ticker}?outputsize=full`);
+      const res = await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=demo');
+      // const res = await fetch('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo')
+      //const res = await fetch(`http://127.0.0.1:8000/api/stock/${ticker}?outputsize=full`);
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
@@ -65,15 +65,15 @@ function App() {
       // AlphaVantage uses "Time Series (Daily)" as the key for daily data
       const ts = data['Time Series (Daily)'] || data['Time Series (Daily)'] || {};
       const ohlc = Object.keys(ts).map((dateStr) => {
-          const d = ts[dateStr];
-          return {
-            time: dateStr, // 'YYYY-MM-DD' accepted by lightweight-charts
-            open: parseFloat(d['1. open']),
-            high: parseFloat(d['2. high']),
-            low: parseFloat(d['3. low']),
-            close: parseFloat(d['4. close']),
-          };
-        })
+        const d = ts[dateStr];
+        return {
+          time: dateStr, // 'YYYY-MM-DD' accepted by lightweight-charts
+          open: parseFloat(d['1. open']),
+          high: parseFloat(d['2. high']),
+          low: parseFloat(d['3. low']),
+          close: parseFloat(d['4. close']),
+        };
+      })
         .sort((a, b) => a.time.localeCompare(b.time)); // ascending by date
 
       // store OHLC array directly — TradingViewChart expects this shape
@@ -86,10 +86,10 @@ function App() {
     } finally {
       setLoading(false);
     }
-    
+
   };
 
- 
+
 
   return (
     <main className="App">

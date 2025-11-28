@@ -21,8 +21,6 @@ app.get('/api/search/:symbol', async (req, res) => {
   }
 
   try {
-    // 1) validate input (return 400 if missing/too short)
-    // 2) check searchCache.get(key) and return cached.data if not expired
     const key = symbol.toLowerCase();
     const cached = cacheService.getCachedSearch(key);
     if (cached) {
@@ -30,8 +28,6 @@ app.get('/api/search/:symbol', async (req, res) => {
       return res.json(cached);
     }
     const resp = await searchSymbol(symbol);
-    //check for errors
-    // TODO: move API error normalization to a tiny helper (alphaErrorOf(resp.data))
 
     if (resp.data.Note || resp.data['Error Message'] || resp.data.Information) {
       return res.status(429).json({ error: resp.data.Note || resp.data['Error Message'] || resp.data.Information });
@@ -39,8 +35,6 @@ app.get('/api/search/:symbol', async (req, res) => {
     const ttL = 60 * 1000;
     cacheService.setCachedSearch(key, resp.data, ttL);
     return res.json(resp.data);
-    // 4) if resp.data.Note / resp.data['Error Message'] -> res.status(429).json({ error: ... })
-    // 5) cache and return resp.data (set TTL ~60s)
   } catch (error) {
     console.error('search error:', error?.response?.data || error.message);
     res.status(500).json({ error: 'Error fetching stock data' });
@@ -56,8 +50,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
   }
 
   try {
-    const outputsize = 'compact'; // compact returns last 100 data points
-    //CHECK CACHE
+    const outputsize = 'compact';
     const cached = cacheService.getCachedStock(symbol, outputsize);
     if (cached) {
       console.log('Cache HIT for', symbol);
@@ -65,7 +58,6 @@ app.get('/api/stock/:symbol', async (req, res) => {
     }
     console.log('Cache MISS for', symbol);
     const response = await getDailyTimeSeries(symbol, outputsize);
-    // TODO: handle Alpha Vantage rate-limit messages here like in search route
 
     const ttl = outputsize === 'full' ? 24 * 60 * 60 * 1000 : 5 * 60 * 1000;
     cacheService.setCachedStock(symbol, outputsize, response.data, ttl);
@@ -89,14 +81,7 @@ app.get('/api/cache/stats', (req, res) => {
   res.json(stats);
 
 })
-/*app.get('/stock/:ticker', (req, res) => {
-  const ticker = req.params.ticker.toUpperCase();
-  
-  
-});*/
-
-// TODO: add dev-only cache clear endpoint
-// app.post('/api/cache/clear', (req, res) => { const a=searchCache.getStats().size, b=stockCache.getStats().size; searchCache.clear(); stockCache.clear(); res.json({ cleared: { search:a, stock:b } }); });
-// TODO: add /healthz with dependency checks (e.g., AlphaVantage key present)
+// TODO: Add health check endpoint
+// TODO: Add cache clear endpoint for development
 
 app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));

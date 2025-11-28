@@ -14,11 +14,11 @@ const stockCache = new SimpleCache(500);
 const apiKey = ALPHA_VANTAGE_KEY;
 
 app.get('/api/search/:symbol', async (req, res) => {
-  const symbol = (req.params.symbol || '' ).trim();
+  const symbol = (req.params.symbol || '').trim();
   if (!apiKey) {
-    return res.status(500).json({ error: 'Missing API key'});
+    return res.status(500).json({ error: 'Missing API key' });
   }
-    // TODO: strengthen validation (ticker regex ^[A-Z.-]{1,7}$ and normalize to upper-case)
+  // TODO: strengthen validation (ticker regex ^[A-Z.-]{1,7}$ and normalize to upper-case)
 
   if (!symbol || symbol.length < 1) {
     return res.status(400).json({ error: 'Missing or invalid symbol' });
@@ -34,21 +34,14 @@ app.get('/api/search/:symbol', async (req, res) => {
       return res.json(cached);
     }
 
-    const resp = await axios.get('https://www.alphavantage.co/query', {
-        params: {
-        function: 'SYMBOL_SEARCH',
-        keywords: symbol,
-        apikey: apiKey
-        
-      }
-    });
+    
 
     //check for errors
     // TODO: move API error normalization to a tiny helper (alphaErrorOf(resp.data))
 
-  if (resp.data.Note || resp.data['Error Message'] || resp.data.Information) {
-        return res.status(429).json({ error: resp.data.Note || resp.data['Error Message'] || resp.data.Information });
-  }
+    if (resp.data.Note || resp.data['Error Message'] || resp.data.Information) {
+      return res.status(429).json({ error: resp.data.Note || resp.data['Error Message'] || resp.data.Information });
+    }
     const ttL = 60 * 1000;
     searchCache.set(key, resp.data, ttL);
     return res.json(resp.data);
@@ -65,11 +58,11 @@ app.get('/api/stock/:symbol', async (req, res) => {
   const symbol = req.params.symbol;
   if (!apiKey) {
     console.error('ALPHA_VANTAGE_KEY not set in .env');
-    return res.status(500).json({ error: 'Missing API key'} );
+    return res.status(500).json({ error: 'Missing API key' });
   }
 
   try {
-    const outputsize = req.query.outputsize === 'full' ? 'full' : 'compact';
+    const outputsize = 'compact'; // compact returns last 100 data points
     //CHECK CACHE
     const cacheKey = `${symbol}::${outputsize}`;
     const cached = stockCache.get(cacheKey);
@@ -79,25 +72,13 @@ app.get('/api/stock/:symbol', async (req, res) => {
     }
     console.log('Cache MISS for', cacheKey);
     
-    // TODO: extract this external call into services/alphaVantageService.js later
-
-    const response = await axios.get('https://www.alphavantage.co/query', {
-      params: {
-        function: 'TIME_SERIES_DAILY',
-        symbol : symbol,
-        apikey: apiKey,
-        outputsize: outputsize
-      }
-
-    }
-  );
     // TODO: handle Alpha Vantage rate-limit messages here like in search route
 
-  const ttl = outputsize === 'full' ? 24 * 60 * 60 * 1000 : 5 * 60 * 1000;
-  stockCache.set(cacheKey, response.data, ttl);
-  res.json(response.data);
+    const ttl = outputsize === 'full' ? 24 * 60 * 60 * 1000 : 5 * 60 * 1000;
+    stockCache.set(cacheKey, response.data, ttl);
+    res.json(response.data);
 
-  console.log('alpha response keys:', Object.keys(response.data || {}));
+    console.log('alpha response keys:', Object.keys(response.data || {}));
   } catch (error) {
     console.error('alpha fetch error:', error?.response?.data || error.message);
     res.status(500).json({ error: 'Error fetching stock data' });

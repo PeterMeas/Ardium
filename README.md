@@ -23,31 +23,31 @@ This is sort of a passion project to me, in which I plan to combine both passion
 
 #### **1.1 Complete Basic UI**
 
-- [⚠️] Implement navigation state management (active page tracking)
+- [~] Implement navigation state management (active page tracking)
 - [ ] Add click handlers for navigation buttons
 - [ ] Create placeholder pages for Screener, News, Watchlist
-- [⚠️] Polish existing chart functionality
-- [⚠️] Responsive design
+- [~] Polish existing chart functionality
+- [~] Responsive design
 
 #### **1.2 Real Data Integration**
 
-- [✅] Replace mock data with real stock API (Alpha Vantage)
-- [✅] Convert backend data format to proper OHLC for TradingView
-- [✅] Add error handling for API failures
-- [✅] Implement data caching to reduce API calls
-- [✅] Add loading states and spinners
-- [⚠️] Add dynamic suggestions in search bar for tickers
+- [x] Replace mock data with real stock API (Alpha Vantage)
+- [x] Convert backend data format to proper OHLC for TradingView
+- [x] Add error handling for API failures
+- [x] Implement data caching to reduce API calls
+- [x] Add loading states and spinners
+- [~] Add dynamic suggestions in search bar for tickers
 
 #### **1.3 Code Quality & Architecture**
 
-- [✅] Refactor backend to service layer (SOLID principles)
-- [✅] Extract Alpha Vantage API calls to dedicated service
-- [✅] Implement dependency inversion (routes → services)
-- [✅] Add Jest unit tests (9 tests, 100% passing)
-- [✅] Test alphaVantageService (search, daily time series, defaults)
-- [✅] Test SimpleCache (get/set, TTL, LRU eviction, stats)
-- [✅] Migrate frontend from CRA to Vite (10x faster dev)
-- [ ] Continue refactoring (controllers, middleware, validators)
+- [x] Refactor backend to service layer (SOLID principles)
+- [x] Extract Alpha Vantage API calls to dedicated service
+- [x] Implement dependency inversion (routes → services)
+- [x] Add Jest unit tests (9 tests, 100% passing)
+- [x] Test alphaVantageService (search, daily time series, defaults)
+- [x] Test SimpleCache (get/set, TTL, LRU eviction, stats)
+- [x] Migrate frontend from CRA to Vite (10x faster dev)
+- [~] Continue refactoring (controllers, middleware, validators)
 
 #### **1.4 Enhanced Chart Features**
 

@@ -2,15 +2,11 @@
 const { PORT, ALPHA_VANTAGE_KEY, NODE_ENV } = require('./env');
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');
-const SimpleCache = require('./utils/cache');
+const cacheService = require('./utils/cacheService');
+const { searchSymbol, getDailyTimeSeries } = require('./services/alphaVantageService');
 
 const app = express();
 app.use(cors());
-
-
-const searchCache = new SimpleCache(500);
-const stockCache = new SimpleCache(500);
 const apiKey = ALPHA_VANTAGE_KEY;
 
 app.get('/api/search/:symbol', async (req, res) => {
@@ -28,14 +24,12 @@ app.get('/api/search/:symbol', async (req, res) => {
     // 1) validate input (return 400 if missing/too short)
     // 2) check searchCache.get(key) and return cached.data if not expired
     const key = symbol.toLowerCase();
-    const cached = searchCache.get(key);
+    const cached = cacheService.getCachedSearch(key);
     if (cached) {
       console.log('Returning cached search for:', symbol);
       return res.json(cached);
     }
-
-    
-
+    const resp = await searchSymbol(symbol);
     //check for errors
     // TODO: move API error normalization to a tiny helper (alphaErrorOf(resp.data))
 
@@ -43,7 +37,7 @@ app.get('/api/search/:symbol', async (req, res) => {
       return res.status(429).json({ error: resp.data.Note || resp.data['Error Message'] || resp.data.Information });
     }
     const ttL = 60 * 1000;
-    searchCache.set(key, resp.data, ttL);
+    cacheService.setCachedSearch(key, resp.data, ttL);
     return res.json(resp.data);
     // 4) if resp.data.Note / resp.data['Error Message'] -> res.status(429).json({ error: ... })
     // 5) cache and return resp.data (set TTL ~60s)
@@ -64,18 +58,17 @@ app.get('/api/stock/:symbol', async (req, res) => {
   try {
     const outputsize = 'compact'; // compact returns last 100 data points
     //CHECK CACHE
-    const cacheKey = `${symbol}::${outputsize}`;
-    const cached = stockCache.get(cacheKey);
+    const cached = cacheService.getCachedStock(symbol, outputsize);
     if (cached) {
-      console.log('Cache HIT for', cacheKey);
+      console.log('Cache HIT for', symbol);
       return res.json(cached);
     }
-    console.log('Cache MISS for', cacheKey);
-    
+    console.log('Cache MISS for', symbol);
+    const response = await getDailyTimeSeries(symbol, outputsize);
     // TODO: handle Alpha Vantage rate-limit messages here like in search route
 
     const ttl = outputsize === 'full' ? 24 * 60 * 60 * 1000 : 5 * 60 * 1000;
-    stockCache.set(cacheKey, response.data, ttl);
+    cacheService.setCachedStock(symbol, outputsize, response.data, ttl);
     res.json(response.data);
 
     console.log('alpha response keys:', Object.keys(response.data || {}));
@@ -89,8 +82,7 @@ app.get('/api/stock/:symbol', async (req, res) => {
 app.get('/api/cache/stats', (req, res) => {
 
   const stats = {
-    search: searchCache.getStats(),
-    stock: stockCache.getStats(),
+    ...cacheService.getStats(),
     timestamp: new Date().toISOString()
   };
 

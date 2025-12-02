@@ -23,13 +23,23 @@ describe('cacheService', () => {
     })
 
     describe('setCachedStock', () => {
-        test('should verify stockCache.set is called', () => {
+        test('should verify stockCache.set is called w/correct params', () => {
             const fakeData = {
                 symbol: 'AAPL',
                 data: 'compact'
             }
             cacheService.setCachedStock('AAPL', 'compact', fakeData, 100 )
             expect(SimpleCache.mock.instances[1].set).toHaveBeenCalledWith('AAPL::compact', fakeData, 100)
+        })  
+    })
+
+    describe('getCachedSearch', () => {
+        test('should call searchCache with correct key', () => {
+            const data = { symbol: 'HOOD'}
+            SimpleCache.mock.instances[0].get.mockReturnValue(data);
+            const result = cacheService.getCachedSearch('HOOD');
+            expect(SimpleCache.mock.instances[0].get).toHaveBeenCalledWith('hood');
+            expect(result).toEqual(data);
         })
     })
 })

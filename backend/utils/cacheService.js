@@ -14,8 +14,8 @@ function setCachedStock(symbol, outputsize, data, ttl) {
     stockCache.set(cacheKey, data, ttl);
 }
 
-function getCachedSearch(symbol) {
-    return searchCache.get(symbol.toLowerCase())
+    function getCachedSearch(symbol) {
+        return searchCache.get(symbol.toLowerCase())
 }
 
 function setCachedSearch(symbol, data, ttl) {

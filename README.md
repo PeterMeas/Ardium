@@ -8,12 +8,30 @@ This is sort of a passion project to me, in which I plan to combine both passion
 
 ## Current Status:
 
-- **Frontend**: React 19 + Vite with professional TradingView candlestick charts
+- **Frontend**: React 19 + Vite, Client-side routing (`react-router-dom`), professional TradingView candlestick charts
 - **Backend**: Node.js/Express API with service-layer architecture (SOLID principles)
-- **UI/UX**: Clean, minimal navigation with dark/light theme support
+- **UI/UX**: Clean, minimal navigation with dark/light theme support, dedicated feature pages
 - **Architecture**: Refactored with service abstraction, unit tests (9 passing)
 - **Testing**: Jest test suite for backend services and cache utility
 - **Dev Experience**: Vite dev server (~1s start, <100ms hot reload)
+
+## Session Summary (Latest Updates)
+
+### Added
+- **Client-Side Routing**: Integrated `react-router-dom` to support independent navigation paths.
+- **Dedicated Frontend Pages**: Implemented placeholder pages for `ScreenerPage`, `NewsPage`, and `WatchlistPage`.
+- **API Service Abstraction**: Added `/services/api.js` frontend client to route all network calls exclusively to the local Express backend instead of direct Alpha Vantage API calls.
+- **JSDoc Generation**: Automatically added Docstrings and JSDocs to the newly abstracted functions in `api.js` and `ChartsPage.jsx`.
+
+### Changed
+- **Component Architecture**: Abstracted the complex charting state from `App.jsx` into the dedicated `ChartsPage.jsx`.
+- **Navigation Engine**: Extracted link routing state from `App.jsx` and created a modular `Navigation.jsx` component.
+- **Styling Segregation**: Removed inline styling from `TickerInput.jsx` and bundled them neatly inside `TickerInput.css`.
+
+### Fixed
+- **Race conditions**: Solved race condition issues in the dynamic autocompletion using `AbortController` in `TickerInput.jsx` to natively cancel stale HTTP fetches.
+- **Blocking Threads**: Replaced legacy synchronous blocking `window.alert()` inside frontend fetch failures with modern inline React errors (`setFetchError`).
+- **Hardcoded Infrastructure**: Standardized environment variables across the frontend (`VITE_API_URL`) leveraging `import.meta.env` with sensible localhost fallbacks.
 
 ## ![App screenshot](docs/images/screenshot.png)
 
@@ -23,9 +41,9 @@ This is sort of a passion project to me, in which I plan to combine both passion
 
 #### **1.1 Complete Basic UI**
 
-- [~] Implement navigation state management (active page tracking)
-- [ ] Add click handlers for navigation buttons
-- [ ] Create placeholder pages for Screener, News, Watchlist
+- [x] Implement navigation state management (active page tracking)
+- [x] Add click handlers for navigation buttons
+- [x] Create placeholder pages for Screener, News, Watchlist
 - [~] Polish existing chart functionality
 - [~] Responsive design
 
@@ -36,7 +54,7 @@ This is sort of a passion project to me, in which I plan to combine both passion
 - [x] Add error handling for API failures
 - [x] Implement data caching to reduce API calls
 - [x] Add loading states and spinners
-- [~] Add dynamic suggestions in search bar for tickers
+- [x] Add dynamic suggestions in search bar for tickers
 
 #### **1.3 Code Quality & Architecture**
 

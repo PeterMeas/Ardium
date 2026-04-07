@@ -1,3 +1,15 @@
 node_modules/
 .env
 **/.env
+
+# AI Agent / Conversation artifacts
+IMPLEMENTATION_PLAN.md
+task.md
+walkthrough.md
+LLM_*.md
+*PLAN*.md
+*plan*.md
+.agent/
+.agents/
+*_FEEDBACK.md
+QA_*.md

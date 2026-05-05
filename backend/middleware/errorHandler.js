@@ -1,10 +1,6 @@
-const express = require('express');
-const cors = require('cors');
-
-
 function errorHandler(err, req, res, next) {
-    console.log('Unhandled error', err);
-
+    console.error('Unhandled error:', err.message || err);
+    res.status(500).json({ error: 'Internal Server Error' });
 }
 
 module.exports = { 

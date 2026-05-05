@@ -16,7 +16,7 @@ describe('alphaVantageService', () => {
                 data: {
                     bestMatches: [
                         {
-                            "1. symbol": "APPL", "2. name": "Apple Inc."
+                            "1. symbol": "AAPL", "2. name": "Apple Inc."
                         }
                     ]
                 }
@@ -41,18 +41,23 @@ describe('alphaVantageService', () => {
                 }
             )
         })
+
+        test('should throw error on network failure', async () => {
+            axios.get.mockRejectedValue(new Error('Network Error'));
+            await expect(searchSymbol('TSLA')).rejects.toThrow('Network Error');
+        });
     })
 
     describe('getDailyTimeSeries', () => {
         test('should use default outputsize of compact', async () => {
             axios.get.mockResolvedValue( { data: {} });
-            await getDailyTimeSeries('APPL');
+            await getDailyTimeSeries('AAPL');
             expect(axios.get).toHaveBeenCalledWith(
                 'https://www.alphavantage.co/query',
                 {
                     params:{
                         function: 'TIME_SERIES_DAILY',
-                        symbol: 'APPL',
+                        symbol: 'AAPL',
                         apikey: ALPHA_VANTAGE_KEY,
                         outputsize: 'compact'
                     }
@@ -74,6 +79,11 @@ describe('alphaVantageService', () => {
                     }
                 }
             )
+        });
+
+        test('should throw error on network failure', async () => {
+            axios.get.mockRejectedValue(new Error('Network Error'));
+            await expect(getDailyTimeSeries('MSFT')).rejects.toThrow('Network Error');
         });
 
     })

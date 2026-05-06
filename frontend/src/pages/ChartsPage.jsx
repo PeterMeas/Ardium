@@ -85,7 +85,7 @@ export default function ChartsPage() {
         {loading ? (
           <p>Loading...</p>
         ) : fetchError ? (
-          <p style={{ color: 'crimson' }}>{fetchError}</p>
+          <p className="error-text">{fetchError}</p>
         ) : (
           <TradingViewChart data={chartData} />
         )}

@@ -277,3 +277,8 @@ body.dark-mode {
   background-color: #1a1a1a;
   color: white;
 }
+
+.error-text {
+  color: crimson;
+  font-weight: 500;
+}
